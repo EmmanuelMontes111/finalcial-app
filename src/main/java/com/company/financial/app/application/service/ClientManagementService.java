@@ -1,38 +1,73 @@
 package com.company.financial.app.application.service;
 
+import com.company.financial.app.application.mapper.ClientDtoMapper;
+import com.company.financial.app.application.mapper.ClientRequestMapper;
+import com.company.financial.app.application.service.exception.PersistenceException;
 import com.company.financial.app.application.usecases.ClientService;
+import com.company.financial.app.domain.model.Client;
 import com.company.financial.app.domain.model.dto.ClientDto;
 import com.company.financial.app.domain.model.dto.request.ClientRequest;
+import com.company.financial.app.domain.model.responseRest.Response;
+import com.company.financial.app.domain.port.ClientPersistencePort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ClientManagementService implements ClientService {
 
+
+    @Autowired(required=true)
+    ClientPersistencePort clientPersistencePort;
+
+    @Autowired
+    ClientRequestMapper clientRequestMapper;
+
+    @Autowired
+    ClientDtoMapper clientDtoMapper;
+
+
+
     @Override
-    public ResponseEntity<ClientDto> createClient(ClientRequest clientRequest) {
+    public ResponseEntity<Response> createClient(ClientRequest clientRequest) {
+        Client client;
+        Client clientToCreate = clientRequestMapper.requestToModel(clientRequest);
+        Long currentDate = System.currentTimeMillis();
+
+        clientToCreate.toBuilder()
+                .creationDate(currentDate)
+                .modificationDate(currentDate)
+                .build();
+
+        try {
+            client = clientPersistencePort.create(clientToCreate);
+        } catch (Exception ex) {
+            throw new PersistenceException("A ocurrido un error guardando el cliente en base de datos", ex);
+        }
+
+        ClientDto clientDto = clientDtoMapper.modelToDto(client);
+        Response response = new Response(200, clientDto, "Cliente creado exitosamente", "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Response> getClientById(Long identificationNumber) {
         return null;
     }
 
     @Override
-    public ResponseEntity<ClientDto> getClientById(Long identificationNumber) {
+    public ResponseEntity<Response> getAllClients() {
         return null;
     }
 
     @Override
-    public ResponseEntity<List<ClientDto>> getAllClients() {
+    public ResponseEntity<Response> deleteClientById(Long identificationNumber) {
         return null;
     }
 
     @Override
-    public ResponseEntity<ClientDto> deleteClientById(Long identificationNumber) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<ClientDto> updateClient(Long identificationNumber, ClientRequest clientRequest) {
+    public ResponseEntity<Response> updateClient(Long identificationNumber, ClientRequest clientRequest) {
         return null;
     }
 }

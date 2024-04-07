@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
-public class ClientRequest {
+public class ClientRequest implements Serializable {
     private String idType;
     private Long identificationNumber;
     private String name;
     private String lastName;
     private String email;
-    private String birthdate;
+    private Long birthdate;
 }

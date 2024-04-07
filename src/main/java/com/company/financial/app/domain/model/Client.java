@@ -1,14 +1,12 @@
 package com.company.financial.app.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder(toBuilder = true)
 public class Client {
     private Long id;
     private String idType;
@@ -16,7 +14,7 @@ public class Client {
     private String name;
     private String lastName;
     private String email;
-    private String birthdate;
+    private Long birthdate;
     private Long creationDate;
     private Long modificationDate;
 }
