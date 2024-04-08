@@ -1,12 +1,13 @@
 package com.company.financial.app.domain.model.dto.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @AllArgsConstructor
+@Builder
 @Getter
 public class ClientRequest implements Serializable {
     private String idType;
