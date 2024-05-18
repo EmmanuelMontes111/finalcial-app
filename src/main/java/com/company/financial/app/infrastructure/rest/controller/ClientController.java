@@ -24,18 +24,18 @@ public class ClientController {
         return clientService.createClient(clientRequest);
     }
 
-    @PutMapping("/client/update/{id}")
+    @PutMapping("/client/update/{clientId}")
     public ResponseEntity<Response> updateClient(@PathVariable Long clientId, @RequestBody ClientRequest clientRequest) {
         userValidationData.validateData(clientRequest);
         return clientService.updateClient(clientId, clientRequest);
     }
 
-    @GetMapping("/client/{id}")
+    @GetMapping("/client/{clientId}")
     public ResponseEntity<Response> getClient(@PathVariable Long clientId){
         return clientService.getClientById(clientId);
     }
 
-    @PutMapping("/client/delete/{id}")
+    @DeleteMapping("/client/delete/{clientId}")
     public ResponseEntity<Response> deleteClient(@PathVariable Long clientId) {
         return clientService.deleteClientById(clientId);
     }

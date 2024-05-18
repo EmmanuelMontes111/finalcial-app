@@ -32,10 +32,10 @@ public class UserValidationData {
     }
 
     private boolean isValidEmail(String email) {
-        String regex = "^(.+)@(.+)$";
+        String regex = "[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,5}\n";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
+        return matcher.find();
     }
 
     private boolean isShortNameAndLastName(String name, String lastName) {

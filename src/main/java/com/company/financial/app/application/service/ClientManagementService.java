@@ -37,7 +37,7 @@ public class ClientManagementService implements ClientService {
         Client clientToCreate = clientRequestMapper.requestToModel(clientRequest);
         Long currentDate = System.currentTimeMillis();
 
-        clientToCreate.toBuilder()
+        clientToCreate = clientToCreate.toBuilder()
                 .creationDate(currentDate)
                 .modificationDate(currentDate)
                 .build();
@@ -78,12 +78,13 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> deleteClientById(Long identificationNumber) {
-        Client client;
+        ClientDto clientDto;
+        Client clientToDelete;
         ResponseEntity<Response> clientRequest = getClientById(identificationNumber);
-        client = (Client) Objects.requireNonNull(clientRequest.getBody()).getData();
-
+        clientDto = (ClientDto) Objects.requireNonNull(clientRequest.getBody()).getData();
+        clientToDelete = clientDtoMapper.dtoToModel(clientDto);
         try {
-            clientPersistencePort.deleteClient(client);
+            clientPersistencePort.deleteClient(clientToDelete);
         } catch (Exception ex) {
             throw new PersistenceException("A ocurrido un error eliminando el usuario", ex);
         }
@@ -93,21 +94,33 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> updateClient(Long identificationNumber, ClientRequest clientRequest) {
-        Client client;
-        Client clientToUpdate = clientRequestMapper.requestToModel(clientRequest);
-        Long currentDate = System.currentTimeMillis();
+        ClientDto clientFoundDto;
+        Client clientResponse;
+        Client clientFound;
+        ResponseEntity<Response> clientById = getClientById(identificationNumber);
 
-        clientToUpdate = clientToUpdate.toBuilder()
-                .modificationDate(currentDate)
+
+        clientFoundDto = (ClientDto) Objects.requireNonNull(clientById.getBody()).getData();
+        clientFound = clientDtoMapper.dtoToModel(clientFoundDto);
+        Client clientToUpdate = clientRequestMapper.requestToModel(clientRequest);
+
+        clientFound = clientFound.toBuilder()
+                .name(clientToUpdate.getName())
+                .lastName(clientToUpdate.getLastName())
+                .email(clientToUpdate.getEmail())
+                .idType(clientToUpdate.getIdType())
+                .birthdate(clientToUpdate.getBirthdate())
+                .identificationNumber(clientToUpdate.getIdentificationNumber())
+                .modificationDate(System.currentTimeMillis())
                 .build();
 
         try {
-            client = clientPersistencePort.create(clientToUpdate);
+            clientResponse = clientPersistencePort.create(clientFound);
         } catch (Exception ex) {
             throw new PersistenceException("A ocurrido un error actualizando el cliente en base de datos", ex);
         }
 
-        ClientDto clientDto = clientDtoMapper.modelToDto(client);
+        ClientDto clientDto = clientDtoMapper.modelToDto(clientResponse);
         Response response = new Response(200, clientDto, "Cliente actualizado exitosamente", "");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

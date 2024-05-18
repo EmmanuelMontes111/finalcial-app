@@ -17,4 +17,5 @@ public interface ClientDtoMapper {
     @Mapping(source = "creationDate", target = "creationDate")
     @Mapping(source = "modificationDate", target = "modificationDate")
     ClientDto modelToDto(Client client);
+    Client dtoToModel(ClientDto client);
 }
