@@ -9,16 +9,19 @@ import com.company.financial.app.domain.model.dto.ClientDto;
 import com.company.financial.app.domain.model.dto.request.ClientRequest;
 import com.company.financial.app.domain.model.responseRest.Response;
 import com.company.financial.app.domain.port.ClientPersistencePort;
+import com.company.financial.app.infrastructure.rest.controller.ResExceptiont.DataClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class ClientManagementService implements ClientService {
 
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     ClientPersistencePort clientPersistencePort;
 
     @Autowired
@@ -26,7 +29,6 @@ public class ClientManagementService implements ClientService {
 
     @Autowired
     ClientDtoMapper clientDtoMapper;
-
 
 
     @Override
@@ -53,7 +55,20 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> getClientById(Long identificationNumber) {
-        return null;
+        Client client;
+        try {
+            client = clientPersistencePort.getById(identificationNumber);
+        } catch (Exception ex) {
+            if (ex instanceof DataClientException) {
+                throw ex;
+            }
+            //TODO: Analizar si debo generar un nuevo tipo de exepcion
+            throw new PersistenceException("A ocurrido un error en base de datos obteniendo los  datos ", ex);
+        }
+
+        ClientDto clientDto = clientDtoMapper.modelToDto(client);
+        Response response = new Response(200, clientDto, "Informacion del cliente", "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
@@ -63,11 +78,37 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> deleteClientById(Long identificationNumber) {
-        return null;
+        Client client;
+        ResponseEntity<Response> clientRequest = getClientById(identificationNumber);
+        client = (Client) Objects.requireNonNull(clientRequest.getBody()).getData();
+
+        try {
+            clientPersistencePort.deleteClient(client);
+        } catch (Exception ex) {
+            throw new PersistenceException("A ocurrido un error eliminando el usuario", ex);
+        }
+        Response response = new Response(204, null, "Cliente eliminado exitosamente", "");
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<Response> updateClient(Long identificationNumber, ClientRequest clientRequest) {
-        return null;
+        Client client;
+        Client clientToUpdate = clientRequestMapper.requestToModel(clientRequest);
+        Long currentDate = System.currentTimeMillis();
+
+        clientToUpdate = clientToUpdate.toBuilder()
+                .modificationDate(currentDate)
+                .build();
+
+        try {
+            client = clientPersistencePort.create(clientToUpdate);
+        } catch (Exception ex) {
+            throw new PersistenceException("A ocurrido un error actualizando el cliente en base de datos", ex);
+        }
+
+        ClientDto clientDto = clientDtoMapper.modelToDto(client);
+        Response response = new Response(200, clientDto, "Cliente actualizado exitosamente", "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

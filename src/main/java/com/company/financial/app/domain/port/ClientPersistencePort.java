@@ -9,7 +9,7 @@ public interface ClientPersistencePort {
     Client create(Client request);
     Client getById(Long id);
     List<Client> getAll();
-    void deleteById(Long id);
+    void deleteClient(Client client);
     Client update(Client request);
     List<Client> getByIds(List<Long> tasksIds);
 }

@@ -5,11 +5,13 @@ import com.company.financial.app.domain.port.ClientPersistencePort;
 import com.company.financial.app.infrastructure.adapter.entity.ClientEntity;
 import com.company.financial.app.infrastructure.adapter.mapper.ClientEntityModelMapper;
 import com.company.financial.app.infrastructure.adapter.repository.ClientRepository;
+import com.company.financial.app.infrastructure.rest.controller.ResExceptiont.DataClientException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -29,7 +31,13 @@ public class ClientSpringJpaAdapter implements ClientPersistencePort {
 
     @Override
     public Client getById(Long id) {
-        return null;
+        Optional<ClientEntity> clientEntitySaved = clientRepository.findById(id);
+        if (clientEntitySaved.isPresent()) {
+            return clientEntityModelMapper.entityToModel(clientEntitySaved.get());
+        } else {
+            throw new DataClientException("El id del cliente no existe en la base de datos");
+        }
+
     }
 
     @Override
@@ -38,13 +46,16 @@ public class ClientSpringJpaAdapter implements ClientPersistencePort {
     }
 
     @Override
-    public void deleteById(Long id) {
-
+    public void deleteClient(Client client) {
+        ClientEntity clientEntityToSave = clientEntityModelMapper.modelToEntity(client);
+        clientRepository.delete(clientEntityToSave);
     }
 
     @Override
     public Client update(Client request) {
-        return null;
+        ClientEntity clientEntityToUpdate = clientEntityModelMapper.modelToEntity(request);
+        ClientEntity clientEntitySaved = clientRepository.save(clientEntityToUpdate);
+        return clientEntityModelMapper.entityToModel(clientEntitySaved);
     }
 
     @Override
