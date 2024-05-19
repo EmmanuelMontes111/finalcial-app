@@ -12,6 +12,7 @@ public interface ClientService {
 
     ResponseEntity<Response> getAllClients();
     ResponseEntity<Response> getClientsByFilter(ClientRequest clientRequest);
+    ResponseEntity<Response> getClientReports(ClientRequest clientRequest);
 
     ResponseEntity<Response> deleteClientById(Long identificationNumber);
 

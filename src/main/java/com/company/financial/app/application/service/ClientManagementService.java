@@ -3,16 +3,15 @@ package com.company.financial.app.application.service;
 import com.company.financial.app.application.mapper.ClientDtoMapper;
 import com.company.financial.app.application.mapper.ClientRequestMapper;
 import com.company.financial.app.application.service.exception.PersistenceException;
+import com.company.financial.app.application.usecases.BuildStructureReportFiltersUseCase;
 import com.company.financial.app.application.usecases.ClientService;
 import com.company.financial.app.domain.model.Client;
 import com.company.financial.app.domain.model.dto.ClientDto;
 import com.company.financial.app.domain.model.dto.request.ClientRequest;
 import com.company.financial.app.domain.model.responseRest.Response;
 import com.company.financial.app.domain.port.ClientPersistencePort;
-import com.company.financial.app.infrastructure.adapter.entity.ClientEntity;
 import com.company.financial.app.infrastructure.rest.controller.ResExceptiont.DataClientException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,11 @@ public class ClientManagementService implements ClientService {
 
     @Autowired
     ClientRequestMapper clientRequestMapper;
-
     @Autowired
     ClientDtoMapper clientDtoMapper;
+
+    @Autowired
+    BuildStructureReportFiltersUseCase buildStructureReportFiltersUseCase;
 
 
     @Override
@@ -125,6 +126,23 @@ public class ClientManagementService implements ClientService {
     }
 
     @Override
+    public ResponseEntity<Response> getClientReports(ClientRequest clientRequest) {
+        List<ClientDto> clientDtos;
+        ResponseEntity<Response> clientFilter = getClientsByFilter(clientRequest);
+        clientDtos = (List<ClientDto>) Objects.requireNonNull(clientFilter.getBody()).getData();
+
+        String pdfBase64 = buildStructureReportFiltersUseCase.generateTableReportStructure(clientDtos);
+
+        Response response;
+        if (clientDtos.isEmpty()) {
+            response = new Response(200, pdfBase64, "No hay clientes que coincidan con el filtro", "");
+        } else {
+            response = new Response(200, pdfBase64, "Reporte de clientes", "");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<Response> deleteClientById(Long identificationNumber) {
         ClientDto clientDto;
         Client clientToDelete;
@@ -172,4 +190,6 @@ public class ClientManagementService implements ClientService {
         Response response = new Response(200, clientDto, "Cliente actualizado exitosamente", "");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
 }

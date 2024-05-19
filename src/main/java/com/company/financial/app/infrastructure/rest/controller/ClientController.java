@@ -45,6 +45,11 @@ public class ClientController {
         return clientService.getClientsByFilter(clientRequest);
     }
 
+    @GetMapping("/client/report")
+    public ResponseEntity<Response> getClientsReport(@RequestBody ClientRequest clientRequest){
+        return clientService.getClientReports(clientRequest);
+    }
+
     @DeleteMapping("/client/delete/{clientId}")
     public ResponseEntity<Response> deleteClient(@PathVariable Long clientId) {
         return clientService.deleteClientById(clientId);
