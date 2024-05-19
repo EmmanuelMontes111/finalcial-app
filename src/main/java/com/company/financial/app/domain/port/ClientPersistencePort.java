@@ -6,10 +6,11 @@ import java.util.List;
 
 public interface ClientPersistencePort {
 
-    Client create(Client request);
+    Client create(Client client);
     Client getById(Long id);
     List<Client> getAll();
+    List<Client> getClientByFilter(Client clientModel);
     void deleteClient(Client client);
-    Client update(Client request);
+    Client update(Client client);
     List<Client> getByIds(List<Long> tasksIds);
 }

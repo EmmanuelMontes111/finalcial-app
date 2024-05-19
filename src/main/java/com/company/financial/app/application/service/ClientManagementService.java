@@ -9,12 +9,16 @@ import com.company.financial.app.domain.model.dto.ClientDto;
 import com.company.financial.app.domain.model.dto.request.ClientRequest;
 import com.company.financial.app.domain.model.responseRest.Response;
 import com.company.financial.app.domain.port.ClientPersistencePort;
+import com.company.financial.app.infrastructure.adapter.entity.ClientEntity;
 import com.company.financial.app.infrastructure.rest.controller.ResExceptiont.DataClientException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -73,7 +77,51 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> getAllClients() {
-        return null;
+        List<Client> clients;
+        List<ClientDto> clientDtos = new ArrayList<>();
+        try {
+            clients = clientPersistencePort.getAll();
+        } catch (Exception ex) {
+            //TODO: Analizar si debo generar un nuevo tipo de exepcion
+            throw new PersistenceException("A ocurrido un error en base de datos obteniendo los  datos", ex);
+        }
+
+        for (Client client : clients) {
+            clientDtos.add(clientDtoMapper.modelToDto(client));
+        }
+        Response response;
+        if (clientDtos.isEmpty()) {
+            response = new Response(200, clientDtos, "No hay clientes en la base de datos", "");
+        } else {
+            response = new Response(200, clientDtos, "Lista de clientes", "");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Response> getClientsByFilter(ClientRequest clientRequest) {
+        List<Client> clients;
+        List<ClientDto> clientDtos = new ArrayList<>();
+        Client clientLikeFilter = clientRequestMapper.requestToModel(clientRequest);
+
+        try {
+            clients = clientPersistencePort.getClientByFilter(clientLikeFilter);
+        } catch (Exception ex) {
+            //TODO: Analizar si debo generar un nuevo tipo de exepcion
+            throw new PersistenceException("A ocurrido un error en base de datos obteniendo los  datos", ex);
+        }
+
+        for (Client client : clients) {
+            clientDtos.add(clientDtoMapper.modelToDto(client));
+        }
+
+        Response response;
+        if (clientDtos.isEmpty()) {
+            response = new Response(200, clientDtos, "No hay clientes que coincidan con el filtro", "");
+        } else {
+            response = new Response(200, clientDtos, "Lista de clientes", "");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

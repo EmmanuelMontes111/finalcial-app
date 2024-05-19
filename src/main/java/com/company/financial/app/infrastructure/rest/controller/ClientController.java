@@ -18,7 +18,7 @@ public class ClientController {
     @Autowired
     private UserValidationData userValidationData;
 
-    @PostMapping("/client")
+    @PostMapping("/client/create")
     public ResponseEntity<Response> createClient(@RequestBody ClientRequest clientRequest) {
         userValidationData.validateData(clientRequest);
         return clientService.createClient(clientRequest);
@@ -33,6 +33,16 @@ public class ClientController {
     @GetMapping("/client/{clientId}")
     public ResponseEntity<Response> getClient(@PathVariable Long clientId){
         return clientService.getClientById(clientId);
+    }
+
+    @GetMapping("/clients")
+    public ResponseEntity<Response> getClients(){
+        return clientService.getAllClients();
+    }
+
+    @GetMapping("/client/filter")
+    public ResponseEntity<Response> getClientsByFilter(@RequestBody ClientRequest clientRequest){
+        return clientService.getClientsByFilter(clientRequest);
     }
 
     @DeleteMapping("/client/delete/{clientId}")

@@ -1,5 +1,6 @@
 package com.company.financial.app.infrastructure.adapter;
 
+import com.company.financial.app.application.service.ClientEntitySpecification;
 import com.company.financial.app.domain.model.Client;
 import com.company.financial.app.domain.port.ClientPersistencePort;
 import com.company.financial.app.infrastructure.adapter.entity.ClientEntity;
@@ -8,8 +9,10 @@ import com.company.financial.app.infrastructure.adapter.repository.ClientReposit
 import com.company.financial.app.infrastructure.rest.controller.ResExceptiont.DataClientException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +45,29 @@ public class ClientSpringJpaAdapter implements ClientPersistencePort {
 
     @Override
     public List<Client> getAll() {
-        return null;
+        List<ClientEntity> clientEntities;
+        List<Client> clientModels = new ArrayList<>();
+
+        clientEntities = clientRepository.findAll();
+        for (ClientEntity clientEntity : clientEntities) {
+            clientModels.add(clientEntityModelMapper.entityToModel(clientEntity));
+        }
+
+        return clientModels;
+    }
+
+
+    @Override
+    public List<Client> getClientByFilter(Client clientModel) {
+        List<ClientEntity> clientEntities;
+        List<Client> clientModels = new ArrayList<>();
+        ClientEntity clientEntity =  clientEntityModelMapper.modelToEntity(clientModel);
+        Specification<ClientEntity> specification = ClientEntitySpecification.getClientsByFilter(clientEntity);
+        clientEntities  = clientRepository.findAll(specification);
+        for (ClientEntity client : clientEntities) {
+            clientModels.add(clientEntityModelMapper.entityToModel(client));
+        }
+        return clientModels;
     }
 
     @Override
