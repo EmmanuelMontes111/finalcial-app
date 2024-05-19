@@ -34,7 +34,9 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
 	implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.0.6'
-
+	implementation 'org.apache.pdfbox:pdfbox:2.0.28'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
 
 }
 

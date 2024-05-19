@@ -45,9 +45,13 @@ public class ClientController {
         return clientService.getClientsByFilter(clientRequest);
     }
 
-    @GetMapping("/client/report")
-    public ResponseEntity<Response> getClientsReport(@RequestBody ClientRequest clientRequest){
-        return clientService.getClientReports(clientRequest);
+    @GetMapping("/client/report/pdf")
+    public ResponseEntity<Response> getClientsReportPDF(@RequestBody ClientRequest clientRequest){
+        return clientService.getClientReportsPDF(clientRequest);
+    }
+    @GetMapping("/client/report/xml")
+    public ResponseEntity<Response> getClientReportsXML(@RequestBody ClientRequest clientRequest){
+        return clientService.getClientReportsXML(clientRequest);
     }
 
     @DeleteMapping("/client/delete/{clientId}")
