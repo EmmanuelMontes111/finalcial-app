@@ -2,6 +2,10 @@ package com.company.financial.app.application.servelet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,11 +13,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import lombok.Setter;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-
+@Service
 @WebServlet("/loadXml")
 public class XmlServlet extends HttpServlet {
+
+    private static final String XML_FILE_PATH = "archivo.xml";
+
+    @Setter
+    private String xmlContent = "";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -27,6 +38,7 @@ public class XmlServlet extends HttpServlet {
         byte[] xmlBytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
         String xmlContent = new String(xmlBytes);
 
+        // Construir la respuesta HTML
         StringBuilder htmlResponse = new StringBuilder();
         htmlResponse.append("<!DOCTYPE html>");
         htmlResponse.append("<html lang=\"en\">");
@@ -62,11 +74,12 @@ public class XmlServlet extends HttpServlet {
         htmlResponse.append("xhr.send();");
         htmlResponse.append("}");
         htmlResponse.append("function cargarXML(xml) {");
-        htmlResponse.append("var content = xml.responseText;");
+        htmlResponse.append("var docXML = xml.responseXML;");
+        htmlResponse.append("var content = docXML.getElementsByTagName(\"content\")[0].textContent.trim();");
         htmlResponse.append("content = content.replace(/&#13;/g, '\\n');");
         htmlResponse.append("var lines = content.split('\\n').map(line => line.trim()).filter(line => line.length > 0);");
         htmlResponse.append("var tabla = \"<tr><th>Documento</th><th>Tipo de documento</th><th>Nombre</th><th>Apellido</th><th>Fecha de nacimiento</th></tr>\";");
-        htmlResponse.append("for (var i = 0; i < lines.length; i++) {");
+        htmlResponse.append("for (var i = 3; i < lines.length; i++) {");
         htmlResponse.append("var line = lines[i];");
         htmlResponse.append("var cells = line.split(' ');");
         htmlResponse.append("if (cells.length > 5) {");
@@ -87,6 +100,21 @@ public class XmlServlet extends HttpServlet {
         htmlResponse.append("}");
         htmlResponse.append("document.getElementById(\"demo\").innerHTML = tabla;");
         htmlResponse.append("}");
+        htmlResponse.append("</script>");
+        htmlResponse.append("<script>");
+        htmlResponse.append("fetch('https://api.example.com/data')");
+        htmlResponse.append(".then(response => {");
+        htmlResponse.append("if (!response.ok) {");
+        htmlResponse.append("throw new Error('Network response was not ok ' + response.statusText);");
+        htmlResponse.append("}");
+        htmlResponse.append("return response.json();");
+        htmlResponse.append("})");
+        htmlResponse.append(".then(data => {");
+        htmlResponse.append("console.log(data);");
+        htmlResponse.append("})");
+        htmlResponse.append(".catch(error => {");
+        htmlResponse.append("console.error('Hubo un problema con la petición fetch:', error);");
+        htmlResponse.append("});");
         htmlResponse.append("</script>");
         htmlResponse.append("</body>");
         htmlResponse.append("</html>");
