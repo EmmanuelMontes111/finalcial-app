@@ -6,6 +6,7 @@ import com.company.financial.app.application.service.exception.PersistenceExcept
 import com.company.financial.app.application.usecases.BuildStructureReportFiltersUseCase;
 import com.company.financial.app.application.usecases.ClientService;
 import com.company.financial.app.application.utils.PdfToXmlConverter;
+import com.company.financial.app.application.utils.XmlToXslConverter;
 import com.company.financial.app.domain.model.Client;
 import com.company.financial.app.domain.model.dto.ClientDto;
 import com.company.financial.app.domain.model.dto.request.ClientRequest;
@@ -155,6 +156,23 @@ public class ClientManagementService implements ClientService {
             response = new Response(200, xmlBase64, "No hay clientes que coincidan con el filtro", "");
         } else {
             response = new Response(200, xmlBase64, "Reporte de clientes XML", "");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @Override
+    public ResponseEntity<Response> getClientReportsXSL(ClientRequest clientRequest) {
+        List<ClientDto> clientDtos;
+        ResponseEntity<Response> clientFilter = getClientsByFilter(clientRequest);
+        clientDtos = (List<ClientDto>) Objects.requireNonNull(clientFilter.getBody()).getData();
+
+        String pdfBase64 = buildStructureReportFiltersUseCase.generateTableReportStructure(clientDtos);
+        String xmlBase64 = PdfToXmlConverter.getXmlByPdf(pdfBase64);
+        String xslBase64 = XmlToXslConverter.getXslByXml(xmlBase64);
+        Response response;
+        if (clientDtos.isEmpty()) {
+            response = new Response(200, xslBase64, "No hay clientes que coincidan con el filtro", "");
+        } else {
+            response = new Response(200, xslBase64, "Reporte de clientes XSL", "");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

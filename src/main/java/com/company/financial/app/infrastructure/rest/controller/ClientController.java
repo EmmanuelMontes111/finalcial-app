@@ -53,6 +53,10 @@ public class ClientController {
     public ResponseEntity<Response> getClientReportsXML(@RequestBody ClientRequest clientRequest){
         return clientService.getClientReportsXML(clientRequest);
     }
+    @GetMapping("/client/report/xsl")
+    public ResponseEntity<Response> getClientReportsXSL(@RequestBody ClientRequest clientRequest){
+        return clientService.getClientReportsXSL(clientRequest);
+    }
 
     @DeleteMapping("/client/delete/{clientId}")
     public ResponseEntity<Response> deleteClient(@PathVariable Long clientId) {
