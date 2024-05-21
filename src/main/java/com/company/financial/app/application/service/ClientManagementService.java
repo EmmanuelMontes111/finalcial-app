@@ -8,6 +8,7 @@ import com.company.financial.app.application.usecases.ClientService;
 import com.company.financial.app.application.utils.PdfToXmlConverter;
 import com.company.financial.app.domain.model.Client;
 import com.company.financial.app.domain.model.dto.ClientDto;
+import com.company.financial.app.domain.model.dto.ClientsReportDto;
 import com.company.financial.app.domain.model.dto.request.ClientRequest;
 import com.company.financial.app.domain.model.responseRest.Response;
 import com.company.financial.app.domain.port.ClientPersistencePort;
@@ -38,7 +39,7 @@ public class ClientManagementService implements ClientService {
 
 
     @Override
-    public ResponseEntity<Response> createClient(ClientRequest clientRequest) {
+    public ResponseEntity<Response<ClientDto>> createClient(ClientRequest clientRequest) {
         Client client;
         Client clientToCreate = clientRequestMapper.requestToModel(clientRequest);
         Long currentDate = System.currentTimeMillis();
@@ -55,12 +56,12 @@ public class ClientManagementService implements ClientService {
         }
 
         ClientDto clientDto = clientDtoMapper.modelToDto(client);
-        Response response = new Response(200, clientDto, "Cliente creado exitosamente", "");
+        Response<ClientDto> response = new Response<>(200, clientDto, "Cliente creado exitosamente", "");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Response> getClientById(Long identificationNumber) {
+    public ResponseEntity<Response<ClientDto>> getClientById(Long identificationNumber) {
         Client client;
         try {
             client = clientPersistencePort.getById(identificationNumber);
@@ -73,31 +74,59 @@ public class ClientManagementService implements ClientService {
         }
 
         ClientDto clientDto = clientDtoMapper.modelToDto(client);
-        Response response = new Response(200, clientDto, "Informacion del cliente", "");
+        Response response = new Response<>(200, clientDto, "Informacion del cliente", "");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Response> getAllClients() {
+    public ResponseEntity<Response<ClientsReportDto>> getAllClients() {
         List<Client> clients;
         List<ClientDto> clientDtos = new ArrayList<>();
+        double totalInvestmentCompany = 0;
+
         try {
             clients = clientPersistencePort.getAll();
         } catch (Exception ex) {
-            //TODO: Analizar si debo generar un nuevo tipo de exepcion
             throw new PersistenceException("A ocurrido un error en base de datos obteniendo los  datos", ex);
         }
+        totalInvestmentCompany = getReduceTotalInvestment(clients);
 
         for (Client client : clients) {
+            double moneyInvested = client.getMoneyInvested();
+            client = client.toBuilder()
+                    .percentageInvested((moneyInvested / totalInvestmentCompany) * 100)
+                    .build();
             clientDtos.add(clientDtoMapper.modelToDto(client));
         }
-        Response response;
-        if (clientDtos.isEmpty()) {
-            response = new Response(200, clientDtos, "No hay clientes en la base de datos", "");
-        } else {
-            response = new Response(200, clientDtos, "Lista de clientes", "");
-        }
+
+        Response<ClientsReportDto> response = getResponse(clientDtos, totalInvestmentCompany);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private Response<ClientsReportDto> getResponse(List<ClientDto> clientDtos, double totalInvestmentCompany) {
+        ClientsReportDto clientsReportDto;
+        Response<ClientsReportDto> response;
+        if (clientDtos.isEmpty()) {
+            response = new Response<>(200, null, "No hay clientes en la base de datos", "");
+        } else {
+            clientsReportDto = buildBodyClientsReportResponse(clientDtos, totalInvestmentCompany, totalInvestmentCompany);
+            response = new Response<>(200, clientsReportDto, "Lista de clientes", "");
+        }
+        return response;
+    }
+
+    private static Double getReduceTotalInvestment(List<Client> clients) {
+        return clients.stream()
+                .map(Client::getMoneyInvested)
+                .reduce(0.0, Double::sum);
+    }
+
+    private ClientsReportDto buildBodyClientsReportResponse(List<ClientDto> clientDtos, double totalInvestmentClients, double totalInvestmentCompany) {
+        return ClientsReportDto.builder()
+                .clientDtos(clientDtos)
+                .totalInvestmentClients(totalInvestmentClients)
+                .totalInvestmentCompany(totalInvestmentCompany)
+                .build();
     }
 
     @Override
@@ -142,6 +171,7 @@ public class ClientManagementService implements ClientService {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @Override
     public ResponseEntity<Response> getClientReportsXML(ClientRequest clientRequest) {
         List<ClientDto> clientDtos;
@@ -163,27 +193,26 @@ public class ClientManagementService implements ClientService {
     public ResponseEntity<Response> deleteClientById(Long identificationNumber) {
         ClientDto clientDto;
         Client clientToDelete;
-        ResponseEntity<Response> clientRequest = getClientById(identificationNumber);
-        clientDto = (ClientDto) Objects.requireNonNull(clientRequest.getBody()).getData();
+        ResponseEntity<Response<ClientDto>> clientRequest = getClientById(identificationNumber);
+        clientDto = Objects.requireNonNull(clientRequest.getBody()).getData();
         clientToDelete = clientDtoMapper.dtoToModel(clientDto);
         try {
             clientPersistencePort.deleteClient(clientToDelete);
         } catch (Exception ex) {
             throw new PersistenceException("A ocurrido un error eliminando el usuario", ex);
         }
-        Response response = new Response(204, null, "Cliente eliminado exitosamente", "");
+        Response<ClientDto> response = new Response<>(204, null, "Cliente eliminado exitosamente", "");
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
     @Override
-    public ResponseEntity<Response> updateClient(Long identificationNumber, ClientRequest clientRequest) {
+    public ResponseEntity<Response<ClientDto>> updateClient(Long identificationNumber, ClientRequest clientRequest) {
         ClientDto clientFoundDto;
         Client clientResponse;
         Client clientFound;
-        ResponseEntity<Response> clientById = getClientById(identificationNumber);
+        ResponseEntity<Response<ClientDto>> clientById = getClientById(identificationNumber);
 
-
-        clientFoundDto = (ClientDto) Objects.requireNonNull(clientById.getBody()).getData();
+        clientFoundDto = Objects.requireNonNull(clientById.getBody()).getData();
         clientFound = clientDtoMapper.dtoToModel(clientFoundDto);
         Client clientToUpdate = clientRequestMapper.requestToModel(clientRequest);
 
@@ -195,6 +224,7 @@ public class ClientManagementService implements ClientService {
                 .birthdate(clientToUpdate.getBirthdate())
                 .identificationNumber(clientToUpdate.getIdentificationNumber())
                 .modificationDate(System.currentTimeMillis())
+                .moneyInvested(clientToUpdate.getPercentageInvested())
                 .build();
 
         try {
@@ -204,7 +234,7 @@ public class ClientManagementService implements ClientService {
         }
 
         ClientDto clientDto = clientDtoMapper.modelToDto(clientResponse);
-        Response response = new Response(200, clientDto, "Cliente actualizado exitosamente", "");
+        Response<ClientDto> response = new Response<>(200, clientDto, "Cliente actualizado exitosamente", "");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

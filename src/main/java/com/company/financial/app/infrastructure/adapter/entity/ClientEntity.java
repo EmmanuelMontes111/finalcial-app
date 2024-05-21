@@ -23,4 +23,5 @@ public class ClientEntity {
     private Long birthdate;
     private Long creationDate;
     private Long modificationDate;
+    private float moneyInvested;
 }

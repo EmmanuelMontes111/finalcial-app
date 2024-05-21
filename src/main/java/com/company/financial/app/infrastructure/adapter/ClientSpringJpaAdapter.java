@@ -87,4 +87,6 @@ public class ClientSpringJpaAdapter implements ClientPersistencePort {
     public List<Client> getByIds(List<Long> tasksIds) {
         return null;
     }
+
+
 }

@@ -17,4 +17,6 @@ public class Client {
     private Long birthdate;
     private Long creationDate;
     private Long modificationDate;
+    private double moneyInvested;
+    private double percentageInvested;
 }

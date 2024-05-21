@@ -1,6 +1,8 @@
 package com.company.financial.app.infrastructure.rest.controller;
 
 import com.company.financial.app.application.usecases.ClientService;
+import com.company.financial.app.domain.model.dto.ClientDto;
+import com.company.financial.app.domain.model.dto.ClientsReportDto;
 import com.company.financial.app.domain.model.dto.request.ClientRequest;
 import com.company.financial.app.domain.model.responseRest.Response;
 import com.company.financial.app.infrastructure.rest.controller.validations.UserValidationData;
@@ -19,24 +21,24 @@ public class ClientController {
     private UserValidationData userValidationData;
 
     @PostMapping("/client/create")
-    public ResponseEntity<Response> createClient(@RequestBody ClientRequest clientRequest) {
+    public ResponseEntity<Response<ClientDto>> createClient(@RequestBody ClientRequest clientRequest) {
         userValidationData.validateData(clientRequest);
         return clientService.createClient(clientRequest);
     }
 
     @PutMapping("/client/update/{clientId}")
-    public ResponseEntity<Response> updateClient(@PathVariable Long clientId, @RequestBody ClientRequest clientRequest) {
+    public ResponseEntity<Response<ClientDto>> updateClient(@PathVariable Long clientId, @RequestBody ClientRequest clientRequest) {
         userValidationData.validateData(clientRequest);
         return clientService.updateClient(clientId, clientRequest);
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<Response> getClient(@PathVariable Long clientId){
+    public ResponseEntity<Response<ClientDto>> getClient(@PathVariable Long clientId){
         return clientService.getClientById(clientId);
     }
 
     @GetMapping("/clients")
-    public ResponseEntity<Response> getClients(){
+    public ResponseEntity<Response<ClientsReportDto>> getClients(){
         return clientService.getAllClients();
     }
 

@@ -18,6 +18,7 @@ public interface ClientEntityModelMapper {
     @Mapping(source = "birthdate", target = "birthdate")
     @Mapping(source = "creationDate", target = "creationDate")
     @Mapping(source = "modificationDate", target = "modificationDate")
+    @Mapping(source = "moneyInvested", target = "moneyInvested")
     ClientEntity modelToEntity(Client client);
 
     @InheritInverseConfiguration
