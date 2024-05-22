@@ -131,28 +131,46 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> getClientsByFilter(ClientRequest clientRequest) {
-        List<Client> clients;
+        List<Client> clientsByFilter;
+        List<Client> allClients;
         List<ClientDto> clientDtos = new ArrayList<>();
+        double totalInvestmentCompany = 0;
+        double totalInvestmentClients = 0;
         Client clientLikeFilter = clientRequestMapper.requestToModel(clientRequest);
 
         try {
-            clients = clientPersistencePort.getClientByFilter(clientLikeFilter);
+            clientsByFilter = clientPersistencePort.getClientByFilter(clientLikeFilter, clientRequest.getOperatorComparator());
+            allClients = clientPersistencePort.getAll();
         } catch (Exception ex) {
             //TODO: Analizar si debo generar un nuevo tipo de exepcion
             throw new PersistenceException("A ocurrido un error en base de datos obteniendo los  datos", ex);
         }
 
-        for (Client client : clients) {
+        totalInvestmentClients = getReduceTotalInvestment(clientsByFilter);
+        totalInvestmentCompany = getReduceTotalInvestment(allClients);
+
+        for (Client client : clientsByFilter) {
+            double moneyInvested = client.getMoneyInvested();
+            client = client.toBuilder()
+                    .percentageInvested((moneyInvested / totalInvestmentCompany) * 100)
+                    .build();
             clientDtos.add(clientDtoMapper.modelToDto(client));
         }
 
-        Response response;
-        if (clientDtos.isEmpty()) {
-            response = new Response(200, clientDtos, "No hay clientes que coincidan con el filtro", "");
-        } else {
-            response = new Response(200, clientDtos, "Lista de clientes", "");
-        }
+        Response<ClientsReportDto> response = getResponseByFilter(clientDtos, totalInvestmentClients, totalInvestmentCompany);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private Response<ClientsReportDto> getResponseByFilter(List<ClientDto> clientDtos, double totalInvestmentClients, double totalInvestmentCompany) {
+        ClientsReportDto clientsReportDto;
+        Response<ClientsReportDto> response;
+        if (clientDtos.isEmpty()) {
+            response = new Response(200, null, "No hay clientes que coincidan con el filtro", "");
+        } else {
+            clientsReportDto = buildBodyClientsReportResponse(clientDtos, totalInvestmentClients, totalInvestmentCompany);
+            response = new Response(200, clientsReportDto, "Lista de clientes", "");
+        }
+        return response;
     }
 
     @Override

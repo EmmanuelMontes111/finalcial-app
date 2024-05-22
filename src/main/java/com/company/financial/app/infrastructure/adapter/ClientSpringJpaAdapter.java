@@ -58,11 +58,11 @@ public class ClientSpringJpaAdapter implements ClientPersistencePort {
 
 
     @Override
-    public List<Client> getClientByFilter(Client clientModel) {
+    public List<Client> getClientByFilter(Client clientModel, String operatorComparator) {
         List<ClientEntity> clientEntities;
         List<Client> clientModels = new ArrayList<>();
         ClientEntity clientEntity =  clientEntityModelMapper.modelToEntity(clientModel);
-        Specification<ClientEntity> specification = ClientEntitySpecification.getClientsByFilter(clientEntity);
+        Specification<ClientEntity> specification = ClientEntitySpecification.getClientsByFilter(clientEntity, operatorComparator);
         clientEntities  = clientRepository.findAll(specification);
         for (ClientEntity client : clientEntities) {
             clientModels.add(clientEntityModelMapper.entityToModel(client));

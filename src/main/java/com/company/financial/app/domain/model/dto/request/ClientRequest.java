@@ -17,5 +17,5 @@ public class ClientRequest implements Serializable {
     private String email;
     private Long birthdate;
     private double moneyInvested;
-
+    private String operatorComparator;
 }
