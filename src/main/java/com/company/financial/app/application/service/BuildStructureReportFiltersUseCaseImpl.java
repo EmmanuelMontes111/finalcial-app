@@ -3,6 +3,7 @@ package com.company.financial.app.application.service;
 import com.company.financial.app.application.usecases.BuildStructureReportFiltersUseCase;
 import com.company.financial.app.application.utils.GeneratePdf;
 import com.company.financial.app.application.utils.GenerateXML;
+import com.company.financial.app.application.utils.GenerateXSL;
 import com.company.financial.app.domain.model.TableReportStructure;
 import com.company.financial.app.domain.model.dto.ClientDto;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class BuildStructureReportFiltersUseCaseImpl implements BuildStructureRep
     @Override
     public String generateTableReportStructure(List<ClientDto> clientDtos) {
         GenerateXML.createTable( clientDtos);
+        GenerateXSL.createXSL(clientDtos);
         TableReportStructure tableReportStructure = TableReportStructure.builder()
                 .titleDocument(REPORT_FILTER_CLIENTS)
                 .titleTableList(setTitlesTable())

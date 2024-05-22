@@ -62,7 +62,7 @@ public final class GenerateXML {
 
             // Ejemplo de datos de una fila
             for (ClientDto clientDto: clientDtos) {
-                addRow(document, table, clientDto.getId(), clientDto.getIdType(), clientDto.getName(),
+                addRow(document, table, clientDto.getIdentificationNumber().toString(), clientDto.getIdType(), clientDto.getName(),
                         clientDto.getLastName(), clientDto.getEmail(),
                         transformLongToDate(clientDto.getBirthdate()),
                         transformLongToDate(clientDto.getCreationDate()),
