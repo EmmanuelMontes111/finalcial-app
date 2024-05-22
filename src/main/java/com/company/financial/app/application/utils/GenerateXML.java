@@ -53,6 +53,9 @@ public final class GenerateXML {
             createColumnHeader(document, columnHeaders, "moneyInvested");
             createColumnHeader(document, columnHeaders, "percentageInvested");
 
+            // Calcular el total de dinero invertido
+            double totalMoneyInvested = 0;
+
             // Aquí puedes agregar filas de datos
             Element row = document.createElement("row");
             table.appendChild(row);
@@ -65,7 +68,14 @@ public final class GenerateXML {
                         transformLongToDate(clientDto.getCreationDate()),
                         transformLongToDate(clientDto.getModificationDate()),
                         String.valueOf(clientDto.getMoneyInvested()), String.valueOf(clientDto.getPercentageInvested()));
+
+                totalMoneyInvested += clientDto.getMoneyInvested();
             }
+
+            // Agregar el total de dinero invertido al final del documento
+            Element totalElement = document.createElement("totalMoneyInvested");
+            totalElement.appendChild(document.createTextNode(String.valueOf(totalMoneyInvested)));
+            root.appendChild(totalElement);
 
             // Crear una instancia de TransformerFactory
             TransformerFactory transformerFactory = TransformerFactory.newInstance();

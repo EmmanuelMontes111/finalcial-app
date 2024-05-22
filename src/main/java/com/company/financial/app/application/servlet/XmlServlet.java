@@ -90,6 +90,18 @@ public class XmlServlet extends HttpServlet {
                 }
             }
 
+            // Obtener el total de dinero invertido
+            NodeList totalElements = doc.getElementsByTagName("totalMoneyInvested");
+            if (totalElements.getLength() > 0) {
+                String totalMoneyInvested = totalElements.item(0).getTextContent();
+
+                // Agregar una fila para el total al final de la tabla HTML
+                out.println("<tr>");
+                out.println("<td colspan=\"8\" style=\"text-align:right;\"><b>Total Money Invested:</b></td>");
+                out.println("<td colspan=\"2\"><b>" + totalMoneyInvested + "</b></td>");
+                out.println("</tr>");
+            }
+
             // Cerrar la tabla y el documento HTML
             out.println("</table>");
             out.println("</body>");
