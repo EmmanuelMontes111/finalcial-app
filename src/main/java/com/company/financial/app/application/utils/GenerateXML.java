@@ -54,7 +54,7 @@ public final class GenerateXML {
             createColumnHeader(document, columnHeaders, "percentageInvested");
 
             // Calcular el total de dinero invertido
-            double totalMoneyInvested = 0;
+            int totalMoneyInvested = 0;
 
             // Aquí puedes agregar filas de datos
             for (ClientDto clientDto : clientDtos) {

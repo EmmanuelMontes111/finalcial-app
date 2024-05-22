@@ -95,7 +95,7 @@ public class ClientManagementService implements ClientService {
         totalInvestmentCompany = getReduceTotalInvestment(clients);
 
         for (Client client : clients) {
-            double moneyInvested = client.getMoneyInvested();
+            int moneyInvested = client.getMoneyInvested();
             client = client.toBuilder()
                     .percentageInvested((moneyInvested / totalInvestmentCompany) * 100)
                     .build();
@@ -118,10 +118,10 @@ public class ClientManagementService implements ClientService {
         return response;
     }
 
-    private static Double getReduceTotalInvestment(List<Client> clients) {
+    private static Integer getReduceTotalInvestment(List<Client> clients) {
         return clients.stream()
                 .map(Client::getMoneyInvested)
-                .reduce(0.0, Double::sum);
+                .reduce(0, Integer::sum);
     }
 
     private ClientsReportDto buildBodyClientsReportResponse(List<ClientDto> clientDtos, double totalInvestmentClients, double totalInvestmentCompany) {
@@ -153,7 +153,7 @@ public class ClientManagementService implements ClientService {
         totalInvestmentCompany = getReduceTotalInvestment(allClients);
 
         for (Client client : clientsByFilter) {
-            double moneyInvested = client.getMoneyInvested();
+            int moneyInvested = client.getMoneyInvested();
             client = client.toBuilder()
                     .percentageInvested((moneyInvested / totalInvestmentCompany) * 100)
                     .build();

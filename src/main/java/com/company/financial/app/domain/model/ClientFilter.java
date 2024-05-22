@@ -13,6 +13,6 @@ public class ClientFilter {
     private String name;
     private String lastName;
     private String email;
-    private double moneyInvested;
+    private int moneyInvested;
     private String operatorComparator;
 }

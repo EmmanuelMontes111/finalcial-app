@@ -77,7 +77,7 @@ public final class GenerateXSL {
             createTableHeader(document, trElement, "Percentage Invested");
 
             // Crear las filas de datos
-            double totalMoneyInvested = 0;
+            int totalMoneyInvested = 0;
             for (ClientDto clientDto : clientDtos) {
                 Element dataRowElement = document.createElement("tr");
                 tableElement.appendChild(dataRowElement);
