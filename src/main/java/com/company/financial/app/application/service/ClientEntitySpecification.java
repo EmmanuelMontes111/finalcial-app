@@ -1,18 +1,12 @@
 package com.company.financial.app.application.service;
 
-import com.company.financial.app.domain.model.Client;
 import com.company.financial.app.infrastructure.adapter.entity.ClientEntity;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 public class ClientEntitySpecification {
@@ -44,33 +38,27 @@ public class ClientEntitySpecification {
             if (client.getModificationDate() != null) {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("modificationDate"), client.getModificationDate()));
             }
-
-            predicate = getPredicateMoneyInvested(client, operatorComparator, root, criteriaBuilder, predicate);
-
+            if (client.getMoneyInvested() != 0) {
+                predicate = getPredicateMoneyInvested(client, operatorComparator, root, criteriaBuilder, predicate);
+            }
             return predicate;
         };
     }
 
     private static Predicate getPredicateMoneyInvested(ClientEntity client, String operatorComparator, Root<ClientEntity> root, CriteriaBuilder criteriaBuilder, Predicate predicate) {
-        if (Objects.equals(operatorComparator, "=")){
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("moneyInvested"), client.getMoneyInvested()));
-        }
-        else if(">".equals(operatorComparator)){
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThan(root.get("moneyInvested"), client.getMoneyInvested()));
+        if (Objects.equals(operatorComparator, "=")) {
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("moneyInvested"), client.getMoneyInvested()));
+        } else if (">".equals(operatorComparator)) {
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThan(root.get("moneyInvested"), client.getMoneyInvested()));
 
-        }
-        else if("<".equals(operatorComparator)){
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.lessThan(root.get("moneyInvested"), client.getMoneyInvested()));
+        } else if ("<".equals(operatorComparator)) {
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.lessThan(root.get("moneyInvested"), client.getMoneyInvested()));
 
-        }
+        } else if (">=".equals(operatorComparator)) {
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThanOrEqualTo(root.get("moneyInvested"), client.getMoneyInvested()));
 
-        else if(">=".equals(operatorComparator)){
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThanOrEqualTo(root.get("moneyInvested"), client.getMoneyInvested()));
-
-        }
-
-        else if("<=".equals(operatorComparator)){
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.lessThanOrEqualTo(root.get("moneyInvested"), client.getMoneyInvested()));
+        } else if ("<=".equals(operatorComparator)) {
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.lessThanOrEqualTo(root.get("moneyInvested"), client.getMoneyInvested()));
         }
         return predicate;
     }

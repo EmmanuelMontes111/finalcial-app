@@ -176,9 +176,11 @@ public class ClientManagementService implements ClientService {
     @Override
     public ResponseEntity<Response> getClientReportsPDF(ClientRequest clientRequest) {
         List<ClientDto> clientDtos;
+        ClientsReportDto clientsReportDto;
         ResponseEntity<Response> clientFilter = getClientsByFilter(clientRequest);
-        clientDtos = (List<ClientDto>) Objects.requireNonNull(clientFilter.getBody()).getData();
+        clientsReportDto = (ClientsReportDto) Objects.requireNonNull(clientFilter.getBody()).getData();
 
+        clientDtos = clientsReportDto.getClientDtos();
         String pdfBase64 = buildStructureReportFiltersUseCase.generateTableReportStructure(clientDtos);
 
         Response response;
