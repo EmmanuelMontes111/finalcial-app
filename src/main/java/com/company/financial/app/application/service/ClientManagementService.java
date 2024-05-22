@@ -274,7 +274,7 @@ public class ClientManagementService implements ClientService {
                 .birthdate(clientToUpdate.getBirthdate())
                 .identificationNumber(clientToUpdate.getIdentificationNumber())
                 .modificationDate(System.currentTimeMillis())
-                .moneyInvested(clientToUpdate.getPercentageInvested())
+                .moneyInvested(clientToUpdate.getMoneyInvested())
                 .build();
 
         try {
