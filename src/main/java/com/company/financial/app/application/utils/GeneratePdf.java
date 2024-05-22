@@ -94,21 +94,4 @@ public final class GeneratePdf {
             throw new PersistenceException("La cantidad de columnas no coincide con la cantidad de elementos de la tabla");
         }
     }
-
-//    private static void addImage(Chapter chapter) {
-//        Image image;
-//        try {
-//            image = Image.getInstance(METRO_LOGO);
-//            image.setAbsolutePosition(700, 460);
-//            image.setAlignment(Element.ALIGN_TOP);
-//            image.setAlignment(Element.ALIGN_RIGHT);
-//            image.scaleToFit(100, 100);
-//
-//            chapter.add(image);
-//        } catch (BadElementException ex) {
-//            System.out.println("Image BadElementException" + ex);
-//        } catch (IOException ex) {
-//            System.out.println("Image IOException " + ex);
-//        }
-//    }
 }

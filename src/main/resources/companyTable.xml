@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<company>
+    <table>
+        <columnHeaders>
+            <column>identificationNumber</column>
+            <column>idType</column>
+            <column>name</column>
+            <column>lastName</column>
+            <column>email</column>
+            <column>birthdate</column>
+            <column>creationDate</column>
+            <column>modificationDate</column>
+            <column>moneyInvested</column>
+            <column>percentageInvested</column>
+        </columnHeaders>
+        <row/>
+        <row>
+            <columnValue>987</columnValue>
+            <columnValue>CC</columnValue>
+            <columnValue>Andrea</columnValue>
+            <columnValue>Jordan</columnValue>
+            <columnValue>andrea@gmail.com</columnValue>
+            <columnValue>1972-10-31</columnValue>
+            <columnValue>2024-05-21</columnValue>
+            <columnValue>2024-05-21</columnValue>
+            <columnValue>1000000.0</columnValue>
+            <columnValue>16.666666666666664</columnValue>
+        </row>
+        <row>
+            <columnValue>654</columnValue>
+            <columnValue>CC</columnValue>
+            <columnValue>Emmanuel</columnValue>
+            <columnValue>Montes</columnValue>
+            <columnValue>emmanuel@gmail.com</columnValue>
+            <columnValue>1972-10-31</columnValue>
+            <columnValue>2024-05-21</columnValue>
+            <columnValue>2024-05-21</columnValue>
+            <columnValue>5000000.0</columnValue>
+            <columnValue>83.33333333333334</columnValue>
+        </row>
+    </table>
+    <totalMoneyInvested>6000000.0</totalMoneyInvested>
+</company>

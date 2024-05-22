@@ -16,6 +16,7 @@ public interface ClientService {
     ResponseEntity<Response> getClientsByFilter(ClientRequest clientRequest);
     ResponseEntity<Response> getClientReportsPDF(ClientRequest clientRequest);
     ResponseEntity<Response> getClientReportsXML(ClientRequest clientRequest);
+    ResponseEntity<Response> getClientReportXSL(ClientRequest clientRequest);
 
     ResponseEntity<Response> deleteClientById(Long identificationNumber);
 
