@@ -57,11 +57,7 @@ public final class GenerateXML {
             double totalMoneyInvested = 0;
 
             // Aquí puedes agregar filas de datos
-            Element row = document.createElement("row");
-            table.appendChild(row);
-
-            // Ejemplo de datos de una fila
-            for (ClientDto clientDto: clientDtos) {
+            for (ClientDto clientDto : clientDtos) {
                 addRow(document, table, clientDto.getIdentificationNumber().toString(), clientDto.getIdType(), clientDto.getName(),
                         clientDto.getLastName(), clientDto.getEmail(),
                         transformLongToDate(clientDto.getBirthdate()),
@@ -85,8 +81,12 @@ public final class GenerateXML {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             DOMSource domSource = new DOMSource(document);
 
-            // Ruta del archivo XML
-            String xmlFilePath = "src/main/resources/companyTable.xml";
+            // Obtener la ruta del directorio actual
+            String currentDir = System.getProperty("user.dir");
+
+            // Ruta del archivo XML junto con el nombre del archivo
+            String xmlFileName = "companyTable.xml";
+            String xmlFilePath = currentDir + File.separator + xmlFileName;
             StreamResult streamResult = new StreamResult(new File(xmlFilePath));
 
             // Transformar el DOM a un archivo

@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -177,15 +178,21 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> getClientReportsPDF(ClientRequest clientRequest) {
+        Response response;
         List<ClientDto> clientDtos;
         ClientsReportDto clientsReportDto;
         ResponseEntity<Response> clientFilter = getClientsByFilter(clientRequest);
         clientsReportDto = (ClientsReportDto) Objects.requireNonNull(clientFilter.getBody()).getData();
 
+        if (clientsReportDto == null){
+            response = new Response(200, null, "No hay clientes que coincidan con el filtro", "");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
         clientDtos = clientsReportDto.getClientDtos();
         String pdfBase64 = buildStructureReportFiltersUseCase.generateTableReportStructure(clientDtos);
 
-        Response response;
+
         if (clientDtos.isEmpty()) {
             response = new Response(200, pdfBase64, "No hay clientes que coincidan con el filtro", "");
         } else {
@@ -196,19 +203,24 @@ public class ClientManagementService implements ClientService {
 
     @Override
     public ResponseEntity<Response> getClientReportsXML(ClientRequest clientRequest) {
+        Response response;
         List<ClientDto> clientDtos;
         ClientsReportDto clientsReportDto;
         ResponseEntity<Response> clientFilter = getClientsByFilter(clientRequest);
         clientsReportDto = (ClientsReportDto) Objects.requireNonNull(clientFilter.getBody()).getData();
 
+        if (clientsReportDto == null){
+            response = new Response(200, null, "No hay clientes que coincidan con el filtro", "");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
         clientDtos = clientsReportDto.getClientDtos();
         GenerateXML.createTable(clientDtos);
 
-        String xmlFilePath = "/companyTable.xml";
+        String nameFileXml = "companyTable.xml";
 
-        String xmlBase64 = TransformFileToBase64.transformBase64(xmlFilePath);
+        String xmlBase64 = TransformFileToBase64.transformBase64(nameFileXml);
 
-        Response response;
         if (clientDtos.isEmpty()) {
             response = new Response(200, xmlBase64, "No hay clientes que coincidan con el filtro", "");
         } else {
@@ -218,19 +230,24 @@ public class ClientManagementService implements ClientService {
     }
     @Override
     public ResponseEntity<Response> getClientReportXSL(ClientRequest clientRequest) {
+        Response response;
         List<ClientDto> clientDtos;
         ClientsReportDto clientsReportDto;
         ResponseEntity<Response> clientFilter = getClientsByFilter(clientRequest);
         clientsReportDto = (ClientsReportDto) Objects.requireNonNull(clientFilter.getBody()).getData();
 
+        if (clientsReportDto == null){
+            response = new Response(200, null, "No hay clientes que coincidan con el filtro", "");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
         clientDtos = clientsReportDto.getClientDtos();
         GenerateXSL.createXSL(clientDtos);
 
-        String xslFilePath = "/template.xsl";
+        String nameFileXsl = "template.xsl.xml";
 
-        String xslBase64 = TransformFileToBase64.transformBase64(xslFilePath);
+        String xslBase64 = TransformFileToBase64.transformBase64(nameFileXsl);
 
-        Response response;
         if (clientDtos.isEmpty()) {
             response = new Response(200, xslBase64, "No hay clientes que coincidan con el filtro", "");
         } else {

@@ -5,13 +5,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -25,14 +25,18 @@ public class XmlServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            String xmlFilePath = "/companyTable.xml";
+            // Obtener el directorio actual del usuario
+            String userDir = System.getProperty("user.dir");
+
+            // Construir la ruta completa del archivo XML
+            String xmlFilePath = userDir + File.separator + "companyTable.xml";
 
             // Leer el contenido del archivo XML
-            ClassPathResource resource = new ClassPathResource(xmlFilePath);
+            File file = new File(xmlFilePath);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
 
-            Document doc = builder.parse(resource.getInputStream());
+            Document doc = builder.parse(file);
 
             // Obtener la lista de filas (rows)
             NodeList rows = doc.getElementsByTagName("row");

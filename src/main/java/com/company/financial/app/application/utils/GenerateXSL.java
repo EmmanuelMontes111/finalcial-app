@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,9 @@ public final class GenerateXSL {
 
     public static void createXSL(List<ClientDto> clientDtos) {
         try {
+            // Obtener el directorio actual del usuario
+            String userDir = System.getProperty("user.dir");
+
             // Crear una instancia de DocumentBuilderFactory
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
 
@@ -109,7 +113,7 @@ public final class GenerateXSL {
             DOMSource domSource = new DOMSource(document);
 
             // Ruta del archivo XSL
-            String xslFilePath = "src/main/resources/template.xsl";
+            String xslFilePath = userDir + File.separator + "template.xsl";
             StreamResult streamResult = new StreamResult(new File(xslFilePath));
 
             // Transformar el DOM a un archivo
